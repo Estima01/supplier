@@ -1,8 +1,6 @@
-#login.py
 import PySimpleGUI as sg
-import main
 
-list = []
+list = ['x','x']
 def login():
     layout = [[sg.Text('Informação de login')],
               [sg.Text('Login', size=(15, 1)), sg.InputText()],
@@ -15,7 +13,7 @@ def login():
     return event, values
 
 def cadastro():
-    layout = [[sg.Text('Cadastro')],
+    layout = [[sg.Text('Cadastro de Usuário')],
               [sg.Text('Login', size=(15, 1)), sg.InputText()],
               [sg.Text('Senha', size=(15, 1)), sg.InputText(password_char='*')],
               [sg.Submit('Cadastrar'), sg.Cancel('Cancelar')]]
@@ -24,27 +22,24 @@ def cadastro():
     window.close()
     return event, values
 
-def main():
-    while True:
-        event, values = login()
-        if event in (None, 'Cancelar'):
+while True:
+    event, values = login()
+    if event == 'Login':
+        if values[0] == list[0] and values[1] == list[1]:
+            sg.popup('Login efetuado com sucesso!')
+            from main import estoque
+            estoque()
             break
-        elif event == 'Cadastrar':
-            event, values = cadastro()
-            if event in (None, 'Cancelar'):
-                break
-            else:
-                list.append(values)
-                print(list)
         else:
-            print(values)
-        if event == 'Login':
-            if values in list:
-                print('Login efetuado com sucesso!')
-                import main
-            else:
-                print('Login ou senha incorretos!')
-
-
-if __name__ == '__main__':
-    main()
+            sg.popup('Login ou senha incorretos')
+    if event == 'Cadastrar':
+        event, values = cadastro()
+        if event == 'Cadastrar':
+            list.append(values[0])
+            list.append(values[1])
+            list.pop(0)
+            list.pop(0) 
+            sg.popup('Cadastro efetuado com sucesso!')
+            print(list)
+    elif event == sg.WIN_CLOSED or event == 'Cancelar':
+        break

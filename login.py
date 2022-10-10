@@ -1,6 +1,14 @@
 import PySimpleGUI as sg
+import json
 
-list = ['x','x']
+def save_user(login, password):
+    with open('login.json', 'w') as f:
+        json.dump({'login': login, 'password': password}, f)
+
+def load_user():
+    with open('login.json', 'r') as f:
+        return json.load(f)
+
 def login():
     layout = [[sg.Text('Informação de login')],
               [sg.Text('Login', size=(15, 1)), sg.InputText()],
@@ -24,22 +32,26 @@ def cadastro():
 
 while True:
     event, values = login()
+
     if event == 'Login':
-        if values[0] == list[0] and values[1] == list[1]:
-            sg.popup('Login efetuado com sucesso!')
-            from main import estoque
-            estoque()
-            break
-        else:
-            sg.popup('Login ou senha incorretos')
-    if event == 'Cadastrar':
+        try:
+            user = load_user()
+            if values[0] == user['login'] and values[1] == user['password']:
+                sg.popup('Login realizado com sucesso')
+                from main import estoque
+                estoque()
+                break
+            else:
+                sg.popup('Login ou senha inválidos')
+        except FileNotFoundError:
+            sg.popup('Usuário não cadastrado')
+    elif event == 'Cadastrar':
         event, values = cadastro()
         if event == 'Cadastrar':
-            list.append(values[0])
-            list.append(values[1])
-            list.pop(0)
-            list.pop(0) 
-            sg.popup('Cadastro efetuado com sucesso!')
-            print(list)
-    elif event == sg.WIN_CLOSED or event == 'Cancelar':
+            save_user(values[0], values[1])
+            sg.popup('Usuário cadastrado com sucesso')
+        elif event == 'Cancelar':
+            break
+    elif event == 'Cancelar':
         break
+

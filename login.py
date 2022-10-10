@@ -3,11 +3,12 @@ import json
 
 def save_user(login, password):
     with open('login.json', 'w') as f:
-        json.dump({'login': login, 'password': password}, f)
+        json.dump({'login': login, 'password': password},f)
 
 def load_user():
     with open('login.json', 'r') as f:
         return json.load(f)
+
 
 def login():
     layout = [[sg.Text('Informação de login')],
@@ -36,8 +37,8 @@ while True:
     if event == 'Login':
         try:
             user = load_user()
-            if values[0] == user['login'] and values[1] == user['password']:
-                sg.popup('Login realizado com sucesso')
+            if user['login'] == values[0] and user['password'] == values[1]:
+                sg.popup('Login efetuado com sucesso!')
                 from main import estoque
                 estoque()
                 break
@@ -52,6 +53,6 @@ while True:
             sg.popup('Usuário cadastrado com sucesso')
         elif event == 'Cancelar':
             break
-    elif event == 'Cancelar':
+    elif event == 'Cancelar' or event == sg.WIN_CLOSED:
         break
 

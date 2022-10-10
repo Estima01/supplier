@@ -14,7 +14,6 @@ def estoque():
     auto_size_columns=False,
     justification='center', 
     num_rows=20,
-    alternating_row_color='lightblue',
     key='-TABLE-',
     tooltip='This is a table')],
     [sg.Button('Cadastrar'), sg.Button('Editar'), sg.Button('Excluir'), sg.Button('Sair')]]
@@ -71,11 +70,7 @@ while True:
                 if values[0] == contact_information[i][0]:
                     contact_information.pop(i)
                     sg.popup('Produto excluido com sucesso')
-                    break
-                else:
-                    sg.popup('Produto não encontrado')
         elif event == 'Sair':
             break
-
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         break

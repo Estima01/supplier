@@ -67,10 +67,9 @@ while True:
         event, values = excluir()
         if event == 'Excluir':
             for i in range(len(contact_information)):
-                if values[0] == contact_information[i][0]:
+                if values[0] in contact_information[i]:
                     contact_information.pop(i)
-                    sg.popup('Produto excluido com sucesso')
-        elif event == 'Sair':
-            break
+                    sg.popup('Produto excluído com sucesso')
+                    break        
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         break

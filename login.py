@@ -3,7 +3,8 @@ import json
 
 def save_user(login, password):
     with open('login.json', 'w') as f:
-        json.dump({'login': login, 'password': password},f)
+        json.dump({'login': login, 'password': password}, f)
+
 
 def load_user():
     with open('login.json', 'r') as f:
@@ -39,7 +40,7 @@ while True:
             user = load_user()
             if user['login'] == values[0] and user['password'] == values[1]:
                 sg.popup('Login efetuado com sucesso!')
-                from main import estoque
+                from main import *
                 estoque()
                 break
             else:

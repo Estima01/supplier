@@ -1,14 +1,26 @@
 import PySimpleGUI as sg
-codigo = []
-produto = []
-quantidade = []
-preco = []
+import sqlite3 as sql
 
-contact_information = []
+def create_table():
+    conn = sql.connect('estoque.db')
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS estoque(codigo INTEGER, produto TEXT, quantidade INTEGER, preco REAL)')
+    conn.commit()
+    conn.close()
+
+
+def view():
+    conn = sql.connect('estoque.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM estoque')
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
 
 def estoque():
     layout = [[sg.Text('Estoque')],
-    [sg.Table(values=contact_information, 
+    [sg.Table(values=view(), 
     headings=['Código','Produto','Quantidade','Preço'],
     max_col_width=25, 
     auto_size_columns=False,
@@ -46,30 +58,49 @@ def excluir():
     window.close()
     return event, values
 
+def editar():
+    layout = [[sg.Text('Editar')],
+    [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
+    [sg.Text('Nome do produto', size=(15,1)), sg.InputText()],
+    [sg.Text('Quantidade', size=(15,1)), sg.InputText()],
+    [sg.Text('Preço', size=(15,1)), sg.InputText()],
+    [sg.Button('Editar'), sg.Button('Sair')]]
+
+    window = sg.Window('+Supplier', layout)
+    event, values = window.read()
+    window.close()
+    return event, values
+
+#Menu
 
 while True:
     event, values = estoque()
     if event == 'Cadastrar':
         event, values = cadastro_produto()
         if event == 'Cadastra':
-            codigo.append(values[0])
-            produto.append(values[1])
-            quantidade.append(values[2])
-            preco.append(values[3])
-            contact_information.append([codigo[0],produto[0],quantidade[0],preco[0]])
-            produto.pop(0)
-            quantidade.pop(0)
-            preco.pop(0)
-            codigo.pop(0)
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('INSERT INTO estoque VALUES (:codigo, :produto, :quantidade, :preco)', {'codigo': values[0], 'produto': values[1], 'quantidade': values[2], 'preco': values[3]})
+            conn.commit()
+            conn.close()
+            sg.popup('Produto cadastrado com sucesso')
     elif event == 'Editar':
-        sg.popup('Em desenvolvimento')
+        event, values = editar()
+        if event == 'Editar':
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('UPDATE estoque SET produto = :produto, quantidade = :quantidade, preco = :preco WHERE codigo = :codigo', {'codigo': values[0], 'produto': values[1], 'quantidade': values[2], 'preco': values[3]})
+            conn.commit()
+            conn.close()
+            sg.popup('Produto editado com sucesso')    
     elif event == 'Excluir':
         event, values = excluir()
         if event == 'Excluir':
-            for i in range(len(contact_information)):
-                if values[0] in contact_information[i]:
-                    contact_information.pop(i)
-                    sg.popup('Produto excluído com sucesso')
-                    break        
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('DELETE FROM estoque WHERE codigo = :codigo', {'codigo': values[0]})
+            conn.commit()
+            conn.close()
+            sg.popup('Produto excluído com sucesso')
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         break

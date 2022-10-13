@@ -1,14 +1,28 @@
 import PySimpleGUI as sg
-import json
+import sqlite3 as sql
 
-def save_user(login, password):
-    with open('login.json', 'w') as f:
-        json.dump({'login': login, 'password': password}, f)
+def create_table():
+    conn = sql.connect('users.db')
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS users(login TEXT, senha TEXT)')
+    conn.commit()
+    conn.close()
 
+def create_user(login, senha):
+    conn = sql.connect('users.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO users VALUES(?,?)', (login, senha))
+    conn.commit()
+    conn.close()
 
-def load_user():
-    with open('login.json', 'r') as f:
-        return json.load(f)
+def login_user(login, senha):
+    conn = sql.connect('users.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM users WHERE login=? AND senha=?', (login, senha))
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
 
 
 def login():
@@ -33,24 +47,19 @@ def cadastro():
     return event, values
 
 while True:
+    create_table()
     event, values = login()
-
     if event == 'Login':
-        try:
-            user = load_user()
-            if user['login'] == values[0] and user['password'] == values[1]:
-                sg.popup('Login efetuado com sucesso!')
-                from main import *
-                estoque()
-                break
-            else:
-                sg.popup('Login ou senha inválidos')
-        except FileNotFoundError:
-            sg.popup('Usuário não cadastrado')
+        if login_user(values[0], values[1]):
+            sg.popup('Logado com sucesso')
+            from main import *
+            break
+        else:
+            sg.popup('Login ou senha incorretos')
     elif event == 'Cadastrar':
         event, values = cadastro()
         if event == 'Cadastrar':
-            save_user(values[0], values[1])
+            create_user(values[0], values[1])
             sg.popup('Usuário cadastrado com sucesso')
         elif event == 'Cancelar':
             break

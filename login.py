@@ -1,21 +1,22 @@
 import PySimpleGUI as sg
 import sqlite3 as sql
 
-def create_table():
+
+def create_table(): #criação das tabelas para o usuario
     conn = sql.connect('users.db')
     c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS users(login TEXT, senha TEXT)')
     conn.commit()
     conn.close()
 
-def create_user(login, senha):
+def create_user(login, senha): #criação do usuario dentro da tabela
     conn = sql.connect('users.db')
     c = conn.cursor()
     c.execute('INSERT INTO users VALUES(?,?)', (login, senha))
     conn.commit()
     conn.close()
 
-def login_user(login, senha):
+def login_user(login, senha): #verificação de login e senha na tabela do usuario
     conn = sql.connect('users.db')
     c = conn.cursor()
     c.execute('SELECT * FROM users WHERE login=? AND senha=?', (login, senha))
@@ -25,7 +26,7 @@ def login_user(login, senha):
 
 
 
-def login():
+def login(): #tela inicial de login
     layout = [[sg.Text('Informação de login')],
               [sg.Text('Login', size=(15, 1)), sg.InputText()],
               [sg.Text('Senha', size=(15, 1)), sg.InputText(password_char='*')],
@@ -36,7 +37,7 @@ def login():
     window.close()
     return event, values
 
-def cadastro():
+def cadastro(): #tela de cadastro do usuario
     layout = [[sg.Text('Cadastro de Usuário')],
               [sg.Text('Login', size=(15, 1)), sg.InputText()],
               [sg.Text('Senha', size=(15, 1)), sg.InputText(password_char='*')],
@@ -46,7 +47,7 @@ def cadastro():
     window.close()
     return event, values
 
-while True:
+while True: #loop da area de login
     create_table()
     event, values = login()
     if event == 'Login':

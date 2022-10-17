@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 import sqlite3 as sql
 
-def create_table():
+def create_table(): #criação da tabela de estoque
     conn = sql.connect('estoque.db')
     c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS estoque(codigo INTEGER, produto TEXT, quantidade INTEGER, preco REAL)')
@@ -9,7 +9,7 @@ def create_table():
     conn.close()
 
 
-def view():
+def view(): #visualização da tabela de estoque
     conn = sql.connect('estoque.db')
     c = conn.cursor()
     c.execute('SELECT * FROM estoque')
@@ -18,7 +18,7 @@ def view():
     return rows
 
 
-def estoque():
+def estoque(): #tela do estoque
     layout = [[sg.Text('Estoque')],
     [sg.Table(values=view(), 
     headings=['Código','Produto','Quantidade','Preço'],
@@ -35,7 +35,7 @@ def estoque():
     window.close()
     return event, values
 
-def cadastro_produto():
+def cadastro_produto(): #tela de cadastro de itens no estoque
     layout = [[sg.Text('Cadastro de produtos')],
     [sg.Text('Código', size=(15,1)), sg.InputText()],
     [sg.Text('Nome do produto', size=(15,1)), sg.InputText()],
@@ -48,7 +48,7 @@ def cadastro_produto():
     window.close()
     return event, values
 
-def excluir():
+def excluir(): #tela de exclusão de itens no estoque
     layout = [[sg.Text('Excluir')],
     [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
     [sg.Button('Excluir'), sg.Button('Sair')]]
@@ -58,7 +58,7 @@ def excluir():
     window.close()
     return event, values
 
-def editar():
+def editar(): #tela de edição de itens no estoque
     layout = [[sg.Text('Editar')],
     [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
     [sg.Text('Nome do produto', size=(15,1)), sg.InputText()],
@@ -71,7 +71,7 @@ def editar():
     window.close()
     return event, values
 
-#Menu
+#Menu principal
 
 while True:
     event, values = estoque()

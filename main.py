@@ -103,4 +103,5 @@ while True:
             conn.close()
             sg.popup('Produto excluído com sucesso')
     elif event == 'Sair' or event == sg.WIN_CLOSED:
+        from login import *
         break

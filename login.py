@@ -28,11 +28,11 @@ def login_user(login, senha): #verificação de login e senha na tabela do usuar
 
 def login(): #tela inicial de login
     layout_direita = [
-            [sg.Image('./image/login.png'), sg.InputText()],
-            [sg.Image('./image/password.png'), sg.InputText(password_char='*')],
+            [sg.Image('./image/login.png'), sg.InputText(size=(30,1))],
+            [sg.Image('./image/password.png',size=(30,30)), sg.InputText(password_char='*', size=(30,1))],
             [sg.Submit('Login'), sg.Cancel('Cancelar'), sg.Button('Cadastrar')]]
     layout_esquerda = [[sg.Image('./image/logo.png')]]
-    layout = [[sg.Column(layout_esquerda),sg.Push(),sg.Column(layout_direita)]]
+    layout = [[sg.Column(layout_esquerda),sg.Column(layout_direita)]]
 
     window = sg.Window('+Supplier', layout)
     event, values = window.read()
@@ -53,7 +53,6 @@ while True: #loop da area de login
     create_table()
     event, values = login()
     if event == 'Login':
-        print(values)
         login = values[2]
         senha = values[4]
         if login_user(login, senha):

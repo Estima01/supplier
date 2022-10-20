@@ -1,4 +1,4 @@
-# -supplier
+# +supplier
 
 Um sistema de gerenciador de estoque basico, feito em Python, com interface PySimpleGUI.
 
@@ -8,4 +8,5 @@ O armazenamento dos dados inseridos é feito todo em banco de dados, tanto usuar
 
 O programa possui um sistema de login, onde o usuario pode criar uma conta, e logar com ela.
 
-<h1> A pasta exeutavel com um .exe junto as tabelas de registro e estoque, basta baixar a pasta e testar.</h1>
+<h1>Para testar/usar</h1>
+<h2> Basta baixar a pasta exeutavel. A mesma contem o arquivo executavel, as tabelas e o atalho para uso.</h2>

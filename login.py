@@ -70,4 +70,4 @@ while True: #loop da area de login
             break
     elif event == 'Cancelar' or event == sg.WIN_CLOSED:
         break
-
+    break

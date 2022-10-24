@@ -17,6 +17,26 @@ def view(): #visualização da tabela de estoque
     rows = c.fetchall()
     conn.close()
     return rows
+
+def carrinho():
+    conn = sql.connect('carrinho.db')
+    c = conn.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS carrinho(codigo INTEGER, produto TEXT, quantidade INTEGER, preco REAL)')
+    conn.commit()
+    conn.close()
+def view_carrinho():
+    conn = sql.connect('carrinho.db')
+    c = conn.cursor()
+    c.execute('SELECT * FROM carrinho')
+    rows = c.fetchall()
+    conn.close()
+    return rows
+def add_carrinho():
+    conn = sql.connect('carrinho.db')
+    c = conn.cursor()
+    c.execute('INSERT INTO carrinho VALUES(?,?,?,?)')
+    conn.commit()
+    conn.close()
 #--------------------------------------------------------------#
 
 def estoque(): #tela do estoque
@@ -82,10 +102,19 @@ def ponto_de_venda():
     max_col_width=25,
     auto_size_columns=False, 
     justification='center', 
-    num_rows=20, key='-TABLE-', 
+    num_rows=10, key='-TABLE-', 
     tooltip='This is a table')],
-    [sg.Button('Adicionar ao Carrinho'),sg.Button('Vender'), sg.Button('Sair')],
-    [sg.Text('Total: R$') ,sg.Text('Em Desenvolvimento', size=(15,1), key='-TOTAL-')]] 
+    [sg.Button('Adicionar ao carrinho')],
+    [sg.Text('Carrinho')],
+    [sg.Table(values=view_carrinho(),
+    headings=['Código','Produto','Quantidade','Preço'], 
+    max_col_width=25,
+    auto_size_columns=False, 
+    justification='center', 
+    num_rows=10, key='-TABLE-', 
+    tooltip='This is a table')],
+    [sg.Button('Vender'), sg.Button('Sair')],
+    [sg.Text('Total: R$') ,sg.Text('0,00', size=(15,1), key='-TOTAL-')]] 
 
     window = sg.Window('+Supplier', layout)
     event, values = window.read()
@@ -132,6 +161,7 @@ while True:
             conn.close()
             sg.popup('Produto excluído com sucesso')
     elif event == 'PDV':
+        carrinho()
         event, values = ponto_de_venda()
         if event == 'Vender':
             conn = sql.connect('estoque.db')

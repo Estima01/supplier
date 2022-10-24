@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import PySimpleGUI as sg
 import sqlite3 as sql
 
@@ -16,7 +17,7 @@ def view(): #visualização da tabela de estoque
     rows = c.fetchall()
     conn.close()
     return rows
-
+#--------------------------------------------------------------#
 
 def estoque(): #tela do estoque
     layout = [[sg.Text('Estoque')],
@@ -28,7 +29,8 @@ def estoque(): #tela do estoque
     num_rows=20,
     key='-TABLE-',
     tooltip='This is a table')],
-    [sg.Button('Cadastrar'), sg.Button('Editar'), sg.Button('Excluir'), sg.Button('Sair')]]
+    [sg.Text('Total: R$') ,sg.Text(valor(), size=(15,1), key='-TOTAL-')],
+    [sg.Button('Cadastrar'), sg.Button('Editar'), sg.Button('Excluir'), sg.Button('Sair'), sg.Button('PDV')]]
                 
     window = sg.Window('+Supplier', layout)
     event, values = window.read()
@@ -71,6 +73,33 @@ def editar(): #tela de edição de itens no estoque
     window.close()
     return event, values
 
+def ponto_de_venda():
+    layout = [[sg.Text('Ponto de Venda')],
+    [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
+    [sg.Text('Quantidade', size=(15,1)), sg.InputText()],
+    [sg.Table(values=view(),
+    headings=['Código','Produto','Quantidade','Preço'], 
+    max_col_width=25,
+    auto_size_columns=False, 
+    justification='center', 
+    num_rows=20, key='-TABLE-', 
+    tooltip='This is a table')],
+    [sg.Button('Adicionar ao Carrinho'),sg.Button('Vender'), sg.Button('Sair')],
+    [sg.Text('Total: R$') ,sg.Text('Em Desenvolvimento', size=(15,1), key='-TOTAL-')]] 
+
+    window = sg.Window('+Supplier', layout)
+    event, values = window.read()
+    window.close()
+    return event, values
+
+def valor():
+    conn = sql.connect('estoque.db')
+    c = conn.cursor()
+    c.execute('SELECT SUM(preco) FROM estoque')
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
 #Menu principal
 
 while True:
@@ -102,6 +131,28 @@ while True:
             conn.commit()
             conn.close()
             sg.popup('Produto excluído com sucesso')
+    elif event == 'PDV':
+        event, values = ponto_de_venda()
+        if event == 'Vender':
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('SELECT quantidade FROM estoque WHERE codigo = :codigo', {'codigo': values[0]})
+            rows = c.fetchall()
+            conn.close()
+            if int(values[1]) > rows[0][0]:
+                sg.popup('Quantidade indisponível')
+            else:
+                conn = sql.connect('estoque.db')
+                c = conn.cursor()
+                c.execute('UPDATE estoque SET quantidade = :quantidade WHERE codigo = :codigo', {'codigo': values[0], 'quantidade': rows[0][0] - int(values[1])})
+                conn.commit()
+                conn.close()
+                sg.popup('Venda realizada com sucesso')
+        elif event == 'Adicionar ao Carrinho':
+            sg.popup('Em desenvolvimento')
+            ponto_de_venda()
+        elif event == 'Sair':
+            break
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         from login import *
         break

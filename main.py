@@ -2,6 +2,8 @@ import PySimpleGUI as sg
 import sqlite3 as sql
 from barcode import EAN13
 from barcode.writer import ImageWriter
+import qrcode as qr
+
 
 def create_table(): #criação da tabela de estoque
     conn = sql.connect('estoque.db')
@@ -19,7 +21,7 @@ def view(): #visualização da tabela de estoque
     conn.close()
     return rows
 
-def valor():
+def valor(): #exibição do valor na tela principal
     conn = sql.connect('estoque.db')
     c = conn.cursor()
     c.execute('SELECT SUM(preco_total) FROM estoque')
@@ -96,7 +98,15 @@ def gerar_codigo(): #tela de geração de código de barras
     event, values = window.read()
     window.close()
     return event, values
+def qrcode(): #tela de gerar qr code
+    layout = [[sg.Text('Gerar QR Code')],
+    [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
+    [sg.Button('Gerar um codigo'),sg.Button("Gerar todos códigos"), sg.Button('Sair')]]
 
+    window = sg.Window('+Supplier', layout)
+    event, values = window.read()
+    window.close()
+    return event, values
 #Menu principal
 
 while True:
@@ -145,7 +155,20 @@ while True:
                 codigo_barrastransformado = codigo_barras.save("{} - codigo".format(i[0]))
             sg.popup('Códigos gerados com sucesso')
     elif event == 'Gerar QR Code':
-        sg.poup('Em desenvolvimento')
+        event, values = qrcode()
+        if event == 'Gerar um codigo':
+            gerar_qr = qr.make(values[0])
+            gerar_qr.save("prod_{}_qr.png".format(values[0]))
+            sg.popup('QR Code gerado com sucesso')
+        elif event == 'Gerar todos códigos':
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('SELECT codigo FROM estoque')
+            codigos = c.fetchall()
+            for i in codigos:
+                gerar_qr = qr.make(str(i[0]))
+                gerar_qr.save("prod_{}_qr.png".format(i[0]))
+            sg.popup('QR Codes gerados com sucesso')
 
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         from login import *

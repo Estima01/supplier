@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 import PySimpleGUI as sg
 import sqlite3 as sql
 from barcode import EAN13
@@ -27,7 +26,10 @@ def valor():
     rows = c.fetchall()
     conn.close()
     for i in rows:
+        if i[0] == None:
+            return '0,00'
         return i[0]
+
 
 #--------------------------------------------------------------#
 
@@ -42,7 +44,7 @@ def estoque(): #tela do estoque
     key='-TABLE-',
     tooltip='This is a table')],
     [sg.Text('Total em mercadoria: R$') ,sg.Text(valor(), size=(15,1), key='-TOTAL-')],
-    [sg.Button('Cadastrar'), sg.Button('Editar'), sg.Button('Excluir'), sg.Button('Gerar código de barras'),sg.Button('Sair')]]
+    [sg.Button('Cadastrar'), sg.Button('Editar'), sg.Button('Excluir'), sg.Button('Gerar código de barras'),sg.Button('Gerar QR Code'),sg.Button('Sair')]]
                 
     window = sg.Window('+Supplier', layout)
     event, values = window.read()
@@ -88,7 +90,7 @@ def editar(): #tela de edição de itens no estoque
 def gerar_codigo(): #tela de geração de código de barras
     layout = [[sg.Text('Gerar código de barras')],
     [sg.Text('Código do produto', size=(15,1)), sg.InputText()],
-    [sg.Button('Gerar'), sg.Button('Sair')]]
+    [sg.Button('Gerar um codigo'),sg.Button("Gerar todos códigos"), sg.Button('Sair')]]
 
     window = sg.Window('+Supplier', layout)
     event, values = window.read()
@@ -114,7 +116,7 @@ while True:
         if event == 'Editar':
             conn = sql.connect('estoque.db')
             c = conn.cursor()
-            c.execute('UPDATE estoque SET produto = :produto, quantidade = :quantidade, preco = :preco WHERE codigo = :codigo', {'codigo': values[0], 'produto': values[1], 'quantidade': values[2], 'preco': values[3]})
+            c.execute('UPDATE estoque SET produto = :produto, quantidade = :quantidade, preco_unitario = :preco WHERE codigo = :codigo', {'codigo': values[0], 'produto': values[1], 'quantidade': values[2], 'preco': values[3], 'preco_total': float(values[2]) * float(values[3])})
             conn.commit()
             conn.close()
             sg.popup('Produto editado com sucesso')    
@@ -129,11 +131,21 @@ while True:
             sg.popup('Produto excluído com sucesso')
     elif event == 'Gerar código de barras':
         event, values = gerar_codigo()
-        if event == 'Gerar':
+        if event == 'Gerar um codigo':
             codigo_barras = EAN13(values[0], writer=ImageWriter())
             codigo_barrastransformado = codigo_barras.save("codigo")
-
-            sg.popup('Código de barras gerado com sucesso')
+            sg.popup('Código gerado com sucesso')
+        elif event == 'Gerar todos códigos':
+            conn = sql.connect('estoque.db')
+            c = conn.cursor()
+            c.execute('SELECT codigo FROM estoque')
+            codigos = c.fetchall()
+            for i in codigos:
+                codigo_barras = EAN13(str(i[0]), writer=ImageWriter())
+                codigo_barrastransformado = codigo_barras.save("{} - codigo".format(i[0]))
+            sg.popup('Códigos gerados com sucesso')
+    elif event == 'Gerar QR Code':
+        sg.poup('Em desenvolvimento')
 
     elif event == 'Sair' or event == sg.WIN_CLOSED:
         from login import *

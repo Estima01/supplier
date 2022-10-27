@@ -53,6 +53,7 @@ while True: #loop da area de login
     create_table()
     event, values = login()
     if event == 'Login':
+        print(values)
         login = values[2]
         senha = values[4]
         if login_user(login, senha):
@@ -70,4 +71,3 @@ while True: #loop da area de login
             break
     elif event == 'Cancelar' or event == sg.WIN_CLOSED:
         break
-    break

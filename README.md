@@ -11,6 +11,12 @@ O programa possui um sistema de login, onde o usuario pode criar uma conta, e lo
 <h1>Para testar/usar</h1>
 <h2> Basta baixar a pasta exeutavel. A mesma contem o arquivo executavel, as tabelas e o atalho para uso.</h2>
 
+<h1>Bibliotecas utilizadas</h1>
+<ul>
+<li>PySimpleGUI - pip install PySimpleGUI</li>
+<li>sqlite3 - pip install sqlite3</li>
+<li>qrcode - pip install qrcode</li>
+</ul>
 
 <h2> Das funcionalidades atuais</h2>
 <ul>
